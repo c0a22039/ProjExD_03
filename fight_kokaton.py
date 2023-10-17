@@ -89,12 +89,6 @@ class Beam:
     """
     ゲームキャラクター（こうかとん）に関するクラス
     """
-    delta = {  # 押下キーと移動量の辞書
-        pg.K_UP: (0, -5),
-        pg.K_DOWN: (0, +5),
-        pg.K_LEFT: (-5, 0),
-        pg.K_RIGHT: (+5, 0),
-    }
 
     def __init__(self, bird):
         """
@@ -158,6 +152,19 @@ class Bomb:
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
 
+class Score:
+
+    def __init__(self):
+        self.font=pg.font.SysFont("hgp創英角ポップ体,30")
+        self.color=(0,0,255)
+        self.score=0 #スコア初期値の設定
+        self.img = self.font.render("Score: 0", True, self.color)
+        self.zahyou=(100,50)
+
+    def update(self, screen: pg.Surface):
+        self.img=self.font.render("スコア：",self.score,self.color)
+        screen.blit(self.img,self.zahyou)
+
 
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
@@ -166,6 +173,7 @@ def main():
     bird = Bird(3, (900, 400))
     bombs = [Bomb() for _ in range(NUM_OF_BOMBS)]
     beam=None
+    score=0
 
     clock = pg.time.Clock()
     tmr = 0
@@ -182,9 +190,16 @@ def main():
             if bird.rct.colliderect(bomb.rct):
             # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
                 bird.change_img(8, screen)
+                pg.display.set_caption("ゲームオーバー")
                 pg.display.update()
                 time.sleep(1)
                 return
+            #if beam.rct.colliderect(bomb.rct):
+                #score+=1
+                #screen.blit(score.img, score.rect)
+                #return
+
+
             
         for i, bomb in enumerate(bombs):    
             if beam is not None:
@@ -193,8 +208,7 @@ def main():
                     bombs[i]=None
                     bird.change_img(6,screen)
                     pg.display.update()
-
-        bombs=[ bomb for bomb in bombs if bomb is not None]            
+        bombs=[ bomb for bomb in bombs if bomb is not None]      
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
