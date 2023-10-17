@@ -78,15 +78,6 @@ class Bird:
 
 
 class Beam:
-    """
-    ゲームキャラクター（こうかとん）に関するクラス
-    """
-    delta = {  # 押下キーと移動量の辞書
-        pg.K_UP: (0, -5),
-        pg.K_DOWN: (0, +5),
-        pg.K_LEFT: (-5, 0),
-        pg.K_RIGHT: (+5, 0),
-    }
 
     def __init__(self, bird):
         """
@@ -99,17 +90,6 @@ class Beam:
         self.rct.left=bird.rct.right #こうかとんの中心横座標
         self.rct.centery = bird.rct.centery #こうかとんの中心縦座標 =の前後どっちもcenteryじゃないとダメ
         self.vx, self.vy = +5, 0
-
-
-
-    def change_img(self, num: int, screen: pg.Surface):
-        """
-        こうかとん画像を切り替え，画面に転送する
-        引数1 num：こうかとん画像ファイル名の番号
-        引数2 screen：画面Surface
-        """
-        self.img = pg.transform.rotozoom(pg.image.load(f"ex03/fig/{num}.png"), 0, 2.0)
-        screen.blit(self.img, self.rct)
 
     def update(self, screen:pg.Surface):
         """
@@ -172,16 +152,27 @@ def main():
         
         screen.blit(bg_img, [0, 0])
         
-        if bird.rct.colliderect(bomb.rct):
-            # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
-            bird.change_img(8, screen)
-            pg.display.update()
-            time.sleep(1)
-            return
+        if bomb is not None:
+            if bird.rct.colliderect(bomb.rct):
+                # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
+                bird.change_img(8, screen)
+                pg.display.update()
+                time.sleep(1)
+                return
+        if beam is not None:
+            if bomb is not None:
+                if beam.rct.colliderect(bomb.rct):  # ビームと爆弾の衝突判定
+                    # 撃墜＝Noneにする
+                    beam = None
+                    bomb = None
+                    bird.change_img(6, screen)
+                    pg.display.update()
+                    time.sleep(1)   
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
-        bomb.update(screen)
+        if bomb is not None:
+            bomb.update(screen)
         if beam is not None:
             beam.update(screen)
         pg.display.update()
