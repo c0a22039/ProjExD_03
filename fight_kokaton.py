@@ -152,14 +152,14 @@ class Bomb:
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
 
-class Score:
+class Score:#課題３
 
     def __init__(self):
-        self.font=pg.font.SysFont("hgp創英角ポップ体,30")
-        self.color=(0,0,255)
+        self.font=pg.font.SysFont("hgp創英角ポップ体,30")# フォントの設定
+        self.color=(0,0,255)#文字色の設定：青 
         self.score=0 #スコア初期値の設定
-        self.img = self.font.render("Score: 0", True, self.color)
-        self.zahyou=(100,50)
+        self.img = self.font.render("Score: 0", True, self.color)#文字列Surfaceの生成
+        self.zahyou=(100,50)#文字列の中心座標
 
     def update(self, screen: pg.Surface):
         self.img=self.font.render("スコア：",self.score,self.color)
