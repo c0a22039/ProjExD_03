@@ -77,6 +77,50 @@ class Bird:
         screen.blit(self.img, self.rct)
 
 
+class Beam:
+    """
+    ゲームキャラクター（こうかとん）に関するクラス
+    """
+    delta = {  # 押下キーと移動量の辞書
+        pg.K_UP: (0, -5),
+        pg.K_DOWN: (0, +5),
+        pg.K_LEFT: (-5, 0),
+        pg.K_RIGHT: (+5, 0),
+    }
+
+    def __init__(self, bird):
+        """
+        こうかとん画像Surfaceを生成する
+        引数1 bird：こうかとんインスタンス(birdクラスのインスタンス)
+        引数2 xy：こうかとん画像の位置座標タプル
+        """
+        self.img = pg.image.load(f"ex03/fig/beam.png") #画像
+        self.rct = self.img.get_rect()
+        self.rct.left=bird.rct.right #こうかとんの中心横座標
+        self.rct.centery = bird.rct.centery #こうかとんの中心縦座標 =の前後どっちもcenteryじゃないとダメ
+        self.vx, self.vy = +5, 0
+
+
+
+    def change_img(self, num: int, screen: pg.Surface):
+        """
+        こうかとん画像を切り替え，画面に転送する
+        引数1 num：こうかとん画像ファイル名の番号
+        引数2 screen：画面Surface
+        """
+        self.img = pg.transform.rotozoom(pg.image.load(f"ex03/fig/{num}.png"), 0, 2.0)
+        screen.blit(self.img, self.rct)
+
+    def update(self, screen:pg.Surface):
+        """
+        ビームを速度vxにしたがって移動させる
+        引数 screen：画面Surface
+        """
+        self.rct.move_ip(self.vx, self.vy)
+        screen.blit(self.img, self.rct)
+
+
+
 class Bomb:
     """
     爆弾に関するクラス
@@ -114,6 +158,7 @@ def main():
     bg_img = pg.image.load("ex03/fig/pg_bg.jpg")
     bird = Bird(3, (900, 400))
     bomb = Bomb((255, 0, 0), 10)
+    beam=None
 
     clock = pg.time.Clock()
     tmr = 0
@@ -121,6 +166,9 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
+            if event.type==pg.KEYDOWN and event.key ==pg.K_SPACE: #キーが押されたらかつキーの種類がスペースキーだったら
+                beam=Beam(bird) #小文字のほうは変数名、大文字のほうはクラスのやつ
+
         
         screen.blit(bg_img, [0, 0])
         
@@ -134,6 +182,8 @@ def main():
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         bomb.update(screen)
+        if beam is not None:
+            beam.update(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
